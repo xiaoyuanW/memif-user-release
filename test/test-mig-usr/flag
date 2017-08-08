@@ -1,0 +1,65 @@
+log:31:    V("bug: cnt %ld localcnt %ld", desc->virt_base, localcnt);
+log:39:    V("bug: cnt %ld localcnt %ld", desc->virt_base, localcnt);
+log:116:      V("bug: cnt %d localcnt %d", desc->virt_base, localcnt);
+log:141:                  desc->virt_base, desc->virt_base_dest); //hym
+log:159:                 V("desc->virt_base %08x", desc->virt_base);
+log:163:                         V("desc: virt_base %08x dest %08x", desc->virt_base,
+Binary file test-mig matches
+Binary file test-mig.o matches
+test-mig.c:280:		desc->virt_base = localcnt++;
+test-mig.c:281:		desc->flag = tid;
+test-mig.c:318:		tid = desc->flag;
+test-mig.c:319:		cnt = desc->virt_base;
+test-mig.c:371:		tid = desc->flag;
+test-mig.c:372:		cnt = desc->virt_base;
+test-mig.c:423:		if (desc->virt_base <= localcnt) {
+test-mig.c:424:			V("bug: cnt %ld localcnt %ld", desc->virt_base, localcnt);
+test-mig.c:427:		localcnt = desc->virt_base;
+test-mig.c:461:		if (desc->virt_base <= localcnt) {
+test-mig.c:462:			V("bug: cnt %ld localcnt %ld", desc->virt_base, localcnt);
+test-mig.c:466:		localcnt = desc->virt_base;
+test-mig.c:490:		desc->virt_base = cnt++;
+test-mig.c:532:		desc->virt_base = cnt++; /* save the increasing counter */
+test-mig.c:584:		desc->virt_base = cnt++; /* save the increasing counter */
+test-mig.c:667:		desc->flag = tid;
+test-mig.c:669:		desc->virt_base =
+test-mig.c:673://		V("%s: desc %08x refcnt %d", __func__, (uint32_t)desc, desc->refcnt);
+test-mig.c:686://		assert(desc->refcnt > 0); // we haven't consumed it yet!
+test-mig.c:688://		if(desc->flag == 0xff) {
+test-mig.c:690://					tid, i, (uint32_t)desc, desc->flag, (uint32_t)tofree);
+test-mig.c:698:		assert(desc->flag < NCPUS);
+test-mig.c:700:		if (desc->virt_base < thread_cnt[desc->flag]) {
+test-mig.c:702:				i, desc->virt_base,
+test-mig.c:703:				thread_cnt[desc->flag],
+test-mig.c:704:				desc->flag);
+test-mig.c:709:		thread_cnt[desc->flag] = desc->virt_base + 1;
+test-mig.c:785:		desc->virt_base = localcnt++;
+test-mig.c:823:				if (desc->next.color != c) { /* consistent with what we have set? */
+test-mig.c:824:					E("bug: color from q: %d local %d idx %d", desc->next.color,
+test-mig.c:830:				if (desc->virt_base <= localcnt) {
+test-mig.c:831:					V("bug: cnt %d localcnt %d", desc->virt_base, localcnt);
+test-mig.c:835:				localcnt = desc->virt_base;
+test-mig.c:1071:	//desc->virt_base = ((unsigned long)page >> MIG_BLOCK_ALIGN_OFFSET);
+test-mig.c:1072:	desc->virt_base = ((unsigned long)page >> MIG_BLOCK_ALIGN_OFFSET); //hym
+test-mig.c:1074:		desc->virt_base_dest = virt_to_base(page1);
+test-mig.c:1076:		desc->node = node;
+test-mig.c:1077:	desc->order = order;
+test-mig.c:1079:	desc->order = order;
+test-mig.c:1081:	printf("desc->order = %d, order =%d\n", desc->order, order);
+test-mig.c:1085:	printf("user: desc->virt_base = %08lx, desc->virt_base_dest = %08lx\n",
+test-mig.c:1086:                 desc->virt_base, desc->virt_base_dest); //hym
+test-mig.c:1087:	printf("user: desc->order = %d\n", desc->order); //hym
+test-mig.c:1090:	D("desc.word0 %08x node %d order %d", desc->word0, desc->node, desc->order);
+test-mig.c:1101:	desc->page_size = HUGE_PAGE_SIZE; //2M page
+test-mig.c:1103:	desc->page_size = PAGE_SIZE; //4k page
+test-mig.c:1285:                desc->virt_base = ((unsigned long)page >> MIG_BLOCK_ALIGN_OFFSET);
+test-mig.c:1286:                desc->node = 1;
+test-mig.c:1287:                desc->order = 0;
+test-mig.c:1289:                V("desc->virt_base %08x", desc->virt_base);
+test-mig.c:1399:                        desc->virt_base = ((unsigned long)page >> MIG_BLOCK_ALIGN_OFFSET);
+test-mig.c:1401:                                desc->virt_base_dest = virt_to_base(ppage1[j]);
+test-mig.c:1403:                                desc->node = 1;
+test-mig.c:1404:                        desc->order = order;
+test-mig.c:1406:                        V("desc: virt_base %08x dest %08x", desc->virt_base,
+test-mig.c:1407:                                        desc->virt_base_dest);
+test-mig.c:1743:	order = 7; // desc->order 3 bit, so tha max value of order is 7

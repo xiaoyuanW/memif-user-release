@@ -1,0 +1,150 @@
+/*
+ * How to use memif on x86 system
+ * Hongyu Miao, June 18, 2016
+ */
+
+
+/********************************** 
+ *     memeif-kernel
+ *********************************/
+
+1. Enable I/OAT in BIOS
+   see: https://docs.google.com/document/d/1qCvakNA3RcibwOpWKpFqU-xZpnLyaNoQSZyYGe8542Q/edit
+
+2. Dowload memif-kernel-4.4
+   $ git clone https://miaohy@bitbucket.org/miaohy/memif-kernel-4.4.git
+
+3. Set .config
+   CMA, HUGETLB, IOAT, DMA  /* check cnofig-hym or .config */
+
+4. Install the kernel
+   $ lspci| grep DMA     /* Will see many DMA channels */
+   $ lsomd| grep ioatdma /* check ioatdma module has been insmoded */
+
+
+
+/**********************************
+ *     memif-user
+ **********************************/
+
+1. Download the source code
+   $ git clone https://miaohy@bitbucket.org/miaohy/memif-user.git
+
+2. Compile libsmm
+   $ cd libsmm
+   $ make
+
+3. Compile memifx86 module
+   $ cd migrate-x86
+   $ Make   /* You may want to change the Path*/
+ 
+4. Install the memx86 module
+   $ sudo insmod migrate-x86-k.ko 
+   $ dmesg  /* You can see something like 'grab a dmaengine chan dma0chan0' */
+
+5. Compile test code
+   $ cd test/test-mig-usr
+   $ Make
+
+6. Test copy/migrate 4K page
+   (1) open test-mig.c
+       $ vim test-mig.c
+   
+   (2) set test parameter (test 4K page)
+       #define PAGE_TEST_4K 0 //hym: 4K page test
+       #define PAGE_TEST_2M 1 //hym: 2M page test
+   
+   (3) set "order = #" /* 2^# pages you want to cp/mig */
+       order = 2;      /* cp/mig 4 pages */
+
+   (4) copy 4k pages test
+       single_move_test(1, p, p1, -1, order); /* copy 2^order pages from p tp p1 */
+
+   (5) migrate 4k pages test
+       single_move_test(1, p, NULL, -1, order); //migrate 2^order pages 
+        
+   Notes: /* like following code, at the end of main()*/
+   1842 #if PAGE_TEST_4K
+   1843         //p = alloc_memory(PAGE_COUNT);
+   1844         //p1 = alloc_memory(PAGE_COUNT);
+   1845         //order = 0; //only one page
+   1846         order = 2; // desc->order 3 bit, so tha max value of order is 7
+   1847         p = numa_alloc_onnode((1<<order) * PAGE_SIZE, 0);
+   1848         p1 = numa_alloc_onnode((1<<order) * PAGE_SIZE, 1);
+   1849         if(!p || !p1){
+   1850                 printf("allocat on node failed!\n");
+   1851                 return 0;
+   1852         }
+   1853         printf("allocate on node success!\n");
+   1854         //single_move_test(1, p, p1, -1, order); //copy 2^order pages from p tp p1
+   1855                                                // copy from node 0 to node 1
+   1856         single_move_test(1, p, NULL, -1, order); //migrate 2^order pages from p(node 0) 
+   1857                                                    //to node 1
+   1858 #endif
+
+7. Test copy/migrate 2M page
+   (1) open test-mig.c
+       $ vim test-mig.c
+
+   (2) set test parameter (test 4K page)
+       #define PAGE_TEST_4K 0 //hym: 4K page test
+       #define PAGE_TEST_2M 1 //hym: 2M page test
+
+   (3) set "order = #" /* 2^# pages you want to cp/mig */
+       order = 2;      /* cp/mig 4 pages */
+
+   (4) copy 2M pages test
+       single_move_test(1, p, p1, -1, order); /* copy 2^order pages from p tp p1 */
+
+   (5) migrate 2M pages test
+       single_move_test(1, p, NULL, -1, order); //migrate 2^order pages 
+
+   1860 #if PAGE_TEST_2M
+   1861         
+   1873         order = 5;
+   1874         p = malloc_huge_pages((1<<order) * HUGE_PAGE_SIZE); //on which node???
+   1875         p1 = malloc_huge_pages((1<<order) * HUGE_PAGE_SIZE); //on which node???
+   1876 
+   1877         if(!p | !p1){
+   1878                 printf("allocat huge pages failed!\n");
+   1879                 return 0;
+   1880         }
+   1881         printf("allocate huge pages success!\n");
+   1882 
+   1883         printf("p = %x\n", p);
+   1884         //single_move_test(1, p, p1, -1, order); //copy huge page
+   1885         single_move_test(1, p, NULL, -1, order); // move huge page
+   1886 
+   1887         if(p){
+   1888                 free_huge_pages(p);
+   1889         }
+   1890 
+   1891         if(p1){
+   1892                 free_huge_pages(p1);
+   1893         }
+   1894 
+   1903 */
+   1904 #endif
+
+   Note:
+        Have to reserve hugepages in kernel parameter(in grubconfig)
+	e.g. hugepagesz=2M hugepages=1000
+
+8. Using multiple channels in one memif descripter. 
+   In step 3: compile migrate-x86-multi-chan.c, instread of migrate-x86.c
+   $ vim migrate-x86/Makefile
+   $ replace "migrate-x86-k-objs := migqueue.o migrate-x86.o" with "migrate-x86-k-objs := migqueue.o migrate-x86-multi-chan.o"
+   $ Make
+ 
+   Note: 
+     
+	migrate-x86.c
+	    1 desc <--> 1 DMA channel
+
+        migrate-86-multi-chan.c
+	    1 desc <--> n DMA channels
+	    /*
+	     * You can decide how many, which of channels you want to use.
+	     * In the current code, one desc is using 16 channels
+	     */
+
