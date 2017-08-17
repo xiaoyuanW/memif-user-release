@@ -1,22 +1,11 @@
-/*
- * How to use memif on x86 system
- * Hongyu Miao, June 18, 2016
- */
-
-
 /********************************** 
  *     memeif-kernel
  *********************************/
 
 1. Enable I/OAT in BIOS
-   see: https://docs.google.com/document/d/1qCvakNA3RcibwOpWKpFqU-xZpnLyaNoQSZyYGe8542Q/edit
-
 2. Dowload memif-kernel-4.4
-   $ git clone https://miaohy@bitbucket.org/miaohy/memif-kernel-4.4.git
-
 3. Set .config
    CMA, HUGETLB, IOAT, DMA  /* check cnofig-hym or .config */
-
 4. Install the kernel
    $ lspci| grep DMA     /* Will see many DMA channels */
    $ lsomd| grep ioatdma /* check ioatdma module has been insmoded */
@@ -28,8 +17,6 @@
  **********************************/
 
 1. Download the source code
-   $ git clone https://miaohy@bitbucket.org/miaohy/memif-user.git
-
 2. Compile libsmm
    $ cd libsmm
    $ make
