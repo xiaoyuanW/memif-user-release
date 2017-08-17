@@ -7,10 +7,6 @@
 3. Set .config
    CMA, HUGETLB, IOAT, DMA  /* check cnofig-hym or .config */
 4. Install the kernel
-   $ lspci| grep DMA     /* Will see many DMA channels */
-   $ lsomd| grep ioatdma /* check ioatdma module has been insmoded */
-
-
 
 /**********************************
  *     memif-user
